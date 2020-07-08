@@ -29,9 +29,11 @@ class LinkedList:
 
     def delete(self, key):
         current_entry = self.head
+        # if key is in the head entry
         if current_entry.key == key:
             self.head = self.head.next
             current_entry.next = None
+            return
         prev_entry = current_entry
         current_entry = current_entry.next
         while current_entry != None:
@@ -41,7 +43,6 @@ class LinkedList:
             else:
                 prev_entry = prev_entry.next
                 current_entry = current_entry.next
-        return None
 
 class HashTable:
     """
