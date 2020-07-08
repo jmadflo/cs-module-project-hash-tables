@@ -3,7 +3,7 @@ def no_dups(s):
     repeats = {}
     words = s.split(' ')
     new_words = []
-    for index, word in enumerate(words):
+    for word in words:
         # print(index, word)
         if word not in repeats:
             repeats[word] = True
