@@ -7,10 +7,43 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
-
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def add_to_head(self, key, value):
+        new_entry = HashTableEntry(key, value)
+        new_entry.next = self.head
+        self.head = new_entry
+
+    def get_value_with_key(self, key):
+        current_entry = self.head
+        while current_entry != None:
+            if current_entry.key == key:
+                return current_entry.value
+            current_entry = current_entry.next
+        return None
+
+    def delete(self, key):
+        current_entry = self.head
+        if current_entry.key == key:
+            self.head = self.head.next
+            current_entry.next = None
+            return current_entry
+        prev_entry = current_entry
+        current_entry = current_entry.next
+        while current_entry != None:
+            if current_entry.key == key:
+                prev_entry.next = current_entry.next
+                current_entry.next = None
+                return current_entry
+            else:
+                prev_entry = prev_entry.next
+                current_entry = current_entry.next
+        return None
 
 class HashTable:
     """
@@ -24,7 +57,7 @@ class HashTable:
         # Your code here
         self.hashtable = [None] * capacity
         self.capacity = capacity
-
+        self.entries_count = 0
 
     def get_num_slots(self):
         """
@@ -39,7 +72,6 @@ class HashTable:
         # Your code here
         return len(self.hashtable)
 
-
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
@@ -47,7 +79,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        return len(self.hashtable) - self.hashtable.count(None)
+        return self.entries_count / self.capacity
 
     def fnv1(self, key):
         """
@@ -59,11 +91,12 @@ class HashTable:
         # Your code here
         sb = key.encode()
 
-        hash = 14695981039346656037
+        offset = 14695981039346656037
+        prime = 1099511628211
 
-        for b in sb:
-            hash = hash ^ b
-            hash = hash * 1099511628211
+        for byte in sb:
+            hash = offset ^ byte
+            hash = hash * prime
         
         return hash
 
@@ -94,7 +127,29 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        self.hashtable[self.hash_index(key)] = value
+        # self.hashtable[self.hash_index(key)] = value
+
+        if self.hashtable[self.hash_index(key)] == None:
+            # the value at this slot is None and doesn't have a Linked List yet
+            new_list = LinkedList()
+            new_list.add_to_head(key, value)
+            self.hashtable[self.hash_index(key)] = new_list 
+        else:
+            # check for existing entry with same key in the linked list
+            if self.hashtable[self.hash_index(key)].get_value_with_key(key) != None:
+                # an existing entry with this key 
+                current_entry = self.hashtable[self.hash_index(key)].head
+                while current_entry != None:
+                    if current_entry.key == key:
+                        current_entry.value = value
+                    current_entry = current_entry.next
+            else:
+                self.hashtable[self.hash_index(key)].add_to_head(key, value)
+
+        self.entries_count += 1
+        # resize hashtable if load factor is too large
+        if self.get_load_factor() > 0.7:
+            self.resize(self.capacity * 2)
 
     def delete(self, key):
         """
@@ -105,8 +160,15 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        self.hashtable[self.hash_index(key)] = None
+        # self.hashtable[self.hash_index(key)] = None
 
+        if self.hashtable[self.hash_index(key)] != None:
+            deleted_node = self.hashtable[self.hash_index(key)].delete(key)
+        else:
+            print("key was not found")
+
+        if self.get_load_factor() < 0.2:
+            self.resize(self.capacity / 2)
 
     def get(self, key):
         """
@@ -117,7 +179,12 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        return self.hashtable[self.hash_index(key)]
+        # return self.hashtable[self.hash_index(key)]
+
+        if self.hashtable[self.hash_index(key)] != None:
+            return self.hashtable[self.hash_index(key)].get_value_with_key(key)
+        else:
+            return None
 
     def resize(self, new_capacity):
         """
@@ -127,7 +194,17 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        pass
+        prev_hashtable = self.hashtable
+        self.hashtable = [None] * new_capacity
+        self.capacity = new_capacity
+        self.entries_count = 0
+
+        for slot in prev_hashtable:
+            if slot != None:
+                current_entry = slot.head
+                while current_entry != None:
+                    self.put(current_entry.key, current_entry.value)
+                    current_entry = current_entry.next
 
 
 if __name__ == "__main__":
