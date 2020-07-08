@@ -32,14 +32,12 @@ class LinkedList:
         if current_entry.key == key:
             self.head = self.head.next
             current_entry.next = None
-            return current_entry
         prev_entry = current_entry
         current_entry = current_entry.next
         while current_entry != None:
             if current_entry.key == key:
                 prev_entry.next = current_entry.next
                 current_entry.next = None
-                return current_entry
             else:
                 prev_entry = prev_entry.next
                 current_entry = current_entry.next
