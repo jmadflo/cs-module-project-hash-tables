@@ -1,6 +1,4 @@
 # Your code here
-
-
 def slowfun_too_slow(x, y):
     v = math.pow(x, y)
     v = math.factorial(v)
