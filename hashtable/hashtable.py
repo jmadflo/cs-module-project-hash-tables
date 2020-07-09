@@ -162,12 +162,13 @@ class HashTable:
         # self.hashtable[self.hash_index(key)] = None
 
         if self.hashtable[self.hash_index(key)] != None:
+            self.entries_count -= 1
             deleted_node = self.hashtable[self.hash_index(key)].delete(key)
         else:
             print("key was not found")
-
+        
         if self.get_load_factor() < 0.2:
-            self.resize(self.capacity / 2)
+            self.resize(self.capacity // 2)
 
     def get(self, key):
         """
