@@ -12,4 +12,16 @@ def f(x):
     return x * 4 + 6
 
 # Your code here
-
+def identify_combinations(q):
+    initial_cache = {}
+    combination_cache = {}
+    for num in q:
+        if num not in initial_cache:
+            initial_cache[num] = f(num)
+    def inner(a, b, c, d):
+        for a in q:
+            for b in q:
+                for c in q:
+                    for d in q:
+                        if f(a) + f(b) == f(c) - f(d) and (a, b, c, d) not in combination_cache:
+                            combination_cache[(a, b, c, d)] = 1
