@@ -29,6 +29,5 @@ def generate_hist(words):
     hist = {key: value for key, value in sorted(hist.items(), key=lambda pair: (-len(pair[1]), pair[0]))}
     for key, value in hist.items():
         print(key + ' ' * (len(longest_word) - len(key)) + value)
-    
-
+        
 generate_hist(words)
